@@ -1,0 +1,24 @@
+{
+  "name": "berrytone",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A home music player for your own library, served on the local network.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "css": "tailwindcss -i styles/app.css -o public/styles.css --minify",
+    "update": "bash scripts/update-robin.sh",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "music-metadata": "^12.3.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "tailwindcss": "^4.3.5"
+  }
+}

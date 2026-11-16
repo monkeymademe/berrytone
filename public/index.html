@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#14080d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="berrytone">
+    <title>berrytone</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div id="shell" class="grid min-h-screen grid-cols-[250px_minmax(0,1fr)] pb-[calc(var(--player)+env(safe-area-inset-bottom))] max-[860px]:block">
+      <aside class="sticky top-0 flex h-screen w-[250px] flex-col gap-[22px] border-r border-line bg-black/30 px-[18px] pt-[22px] pb-[calc(var(--player)+18px)] max-[860px]:z-20 max-[860px]:h-auto max-[860px]:w-full max-[860px]:flex-row max-[860px]:flex-wrap max-[860px]:items-center max-[860px]:gap-x-3.5 max-[860px]:gap-y-2.5 max-[860px]:p-3 max-[860px]:backdrop-blur-lg">
+        <a class="flex items-center gap-3 no-underline" href="/">
+          <span class="mark" aria-hidden="true"></span>
+          <span>
+            <strong class="block font-display text-[1.45rem] leading-none font-semibold tracking-[-0.04em]">berrytone</strong>
+            <small class="tracking-[0.08em] text-muted lowercase">listening room</small>
+          </span>
+        </a>
+        <nav class="flex flex-col gap-1 max-[860px]:flex-row max-[860px]:flex-wrap" aria-label="Library">
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/" data-nav="albums">Albums</a>
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/artists" data-nav="artists">Artists</a>
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/folders" data-nav="folders">Folders</a>
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/downloads" data-nav="downloads">Downloads</a>
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/favourites" data-nav="favourites">Favourites</a>
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/playlists" data-nav="playlists">Playlists</a>
+          <a class="rounded-xl px-3 py-2.5 text-muted no-underline hover:bg-white/5 hover:text-ink aria-[current=page]:bg-white/5 aria-[current=page]:text-ink" href="/find" data-nav="find">Find music</a>
+        </nav>
+        <div class="mt-auto grid gap-2.5 max-[860px]:mt-0">
+          <p id="library-stat" class="m-0 text-muted max-[860px]:hidden">Loading library…</p>
+          <p id="scan-progress" class="note" hidden></p>
+        </div>
+      </aside>
+      <div class="min-w-0">
+        <header class="flex items-center gap-3 px-7 pt-[22px] max-[860px]:px-4 max-[860px]:pt-3">
+          <form id="search-form" class="min-w-0 flex-1" role="search">
+            <label class="sr" for="search">Search the library</label>
+            <input id="search" class="w-full rounded-full border border-line bg-white/[0.04] px-[18px] py-3.5 outline-none focus:border-berry/80" type="search" placeholder="Search artists, albums, and tracks" autocomplete="off" enterkeyhint="search">
+          </form>
+          <div class="relative">
+            <button type="button" id="account" class="grid h-11 w-11 place-items-center rounded-full bg-linear-to-b from-[#ee5480] to-berry-deep text-sm font-semibold text-white shadow-[0_8px_16px_rgba(226,59,106,0.25)]" aria-haspopup="menu" aria-expanded="false" aria-label="Account">
+              <span id="account-mark">♪</span>
+            </button>
+            <div id="account-menu" class="absolute top-[calc(100%+8px)] right-0 z-30 w-64 rounded-2xl border border-line bg-[#1c0c12] p-3 shadow-lift" role="menu" hidden>
+              <p id="account-name" class="m-0 font-semibold">Listening room</p>
+              <p id="account-role" class="m-0 text-sm text-muted" hidden></p>
+              <a id="account-people" class="mt-3 block rounded-xl px-3 py-2 text-muted no-underline hover:bg-white/5 hover:text-ink" href="/admin" hidden>Settings</a>
+              <div class="mt-3 grid gap-2">
+                <button type="button" id="rescan">Rescan</button>
+                <button type="button" id="match" class="ghost">Match albums</button>
+                <button type="button" id="logout" class="ghost" hidden>Log out</button>
+              </div>
+              <p id="host" class="host mt-3"></p>
+            </div>
+          </div>
+        </header>
+        <main id="view" class="min-w-0 px-7 pt-[22px] pb-10 max-[860px]:px-4"></main>
+      </div>
+    </div>
+
+    <footer class="player" id="player">
+      <div class="now">
+        <div class="cover sm" id="now-cover" style="--h:340"><span class="fallback">♪</span></div>
+        <div class="now-copy">
+          <a id="now-title" class="now-title">Nothing playing</a>
+          <a id="now-artist" class="now-artist">Pick a song to start</a>
+        </div>
+      </div>
+      <div class="transport">
+        <div class="transport-buttons">
+          <button type="button" id="shuffle" class="icon-btn" aria-label="Shuffle" aria-pressed="false"></button>
+          <button type="button" id="prev" class="icon-btn" aria-label="Previous"></button>
+          <button type="button" id="play" class="play-btn" aria-label="Play"></button>
+          <button type="button" id="next" class="icon-btn" aria-label="Next"></button>
+          <button type="button" id="repeat" class="icon-btn" aria-label="Repeat off" aria-pressed="false"></button>
+        </div>
+        <div class="scrub">
+          <span id="time-current">0:00</span>
+          <input id="scrubber" type="range" min="0" max="1000" value="0" aria-label="Seek">
+          <span id="time-total">0:00</span>
+        </div>
+      </div>
+      <div class="extras">
+        <label class="volume">
+          <span class="sr">Volume</span>
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+        </label>
+        <button type="button" id="sonos-toggle" class="icon-btn" aria-label="Sonos" aria-expanded="false" hidden></button>
+        <button type="button" id="queue-toggle" class="icon-btn queue-toggle" aria-label="Queue" aria-expanded="false"></button>
+      </div>
+    </footer>
+
+    <aside id="sonos" hidden>
+      <div class="queue-head">
+        <h2>Speakers</h2>
+        <div class="queue-actions">
+          <button type="button" id="sonos-refresh" class="ghost">Look again</button>
+          <button type="button" id="sonos-close" class="ghost" aria-label="Close speakers">Close</button>
+        </div>
+      </div>
+      <p id="sonos-note" class="note">Sends up to 40 songs from the queue. The browser pauses while the speaker plays.</p>
+      <div id="sonos-body"></div>
+      <div id="sonos-controls" class="sonos-controls" hidden></div>
+    </aside>
+    <aside id="queue" class="queue" hidden>
+      <div class="queue-head">
+        <h2>Queue</h2>
+        <div class="queue-actions">
+          <a href="/playlists" id="queue-save">Save</a>
+          <button type="button" id="queue-clear">Clear</button>
+        </div>
+      </div>
+      <ol id="queue-list"></ol>
+    </aside>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <dialog id="confirm" class="info-dialog confirm-dialog">
+      <form method="dialog">
+        <div class="info-head">
+          <h2 id="confirm-title">Are you sure?</h2>
+        </div>
+        <p id="confirm-message"></p>
+        <div class="actions">
+          <button type="submit" class="ghost" value="cancel">Cancel</button>
+          <button type="submit" class="primary" id="confirm-ok" value="ok">Remove</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="merge" class="info-dialog">
+      <form method="dialog">
+        <div class="info-head">
+          <h2 id="merge-title">Merge another album</h2>
+          <button type="submit" class="ghost" value="cancel" aria-label="Close merge">Close</button>
+        </div>
+        <p id="merge-note"></p>
+        <div id="merge-list" class="merge-list"></div>
+        <div class="actions">
+          <button type="submit" class="ghost" value="cancel">Cancel</button>
+          <button type="submit" class="primary" id="merge-ok" value="ok">Merge</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="track-info" class="info-dialog">
+      <form method="dialog">
+        <div class="info-head">
+          <h2 id="track-info-title">Song</h2>
+          <button type="submit" class="ghost" aria-label="Close song information">Close</button>
+        </div>
+        <div id="track-info-body"></div>
+      </form>
+    </dialog>
+    <noscript><p class="noscript">Berrytone needs JavaScript to play your library.</p></noscript>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

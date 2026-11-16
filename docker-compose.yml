@@ -1,0 +1,46 @@
+# Berrytone on robin.
+# From this folder: docker compose up -d --build
+# Then open http://robin.local:8083
+services:
+  berrytone:
+    build: .
+    image: berrytone:local
+    container_name: berrytone
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 5s
+    network_mode: host
+    environment:
+      MUSIC_DIR: /music
+      DOWNLOADS_DIR: /downloads
+      DATA_DIR: /data
+      PORT: "${BERRYTONE_PORT:-8083}"
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      SCAN_CONCURRENCY: ${SCAN_CONCURRENCY:-3}
+      BERRYTONE_USER: ${BERRYTONE_USER:-}
+      BERRYTONE_PASSWORD: ${BERRYTONE_PASSWORD:-}
+    volumes:
+      - ${MUSIC_PATH:-/media/pi/PiDrive/Music}:/music
+      - ${DOWNLOADS_PATH:-/media/pi/PiDrive/YTDL}:/downloads
+      - berrytone-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:'+(process.env.PORT||8083)+'/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  berrytone-data:

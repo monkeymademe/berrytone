@@ -1,0 +1,16 @@
+{
+  "name": "berrytone",
+  "short_name": "berrytone",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#14080d",
+  "theme_color": "#14080d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
